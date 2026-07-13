@@ -11,21 +11,25 @@
 
   <!-- ========== AUTH (Login / Registrieren) ========== -->
   <section id="auth-screen" class="screen">
-    <div class="auth-box">
-      <img src="logo.png" alt="Short Hub" class="auth-logo">
-      <p class="auth-subtitle">Kurze Videos. Große Momente.</p>
+    <div class="auth-wrap">
+      <h1 class="wordmark">Short<span class="hub-badge">Hub</span></h1>
+      <p class="auth-subtitle" data-i18n="tagline">Kurze Videos. Schnelle Momente.</p>
 
-      <div class="auth-tabs">
-        <button id="tab-login" class="auth-tab active">Anmelden</button>
-        <button id="tab-register" class="auth-tab">Registrieren</button>
+      <div class="auth-card">
+        <h2 id="auth-title" data-i18n="login">Anmelden</h2>
+        <form id="auth-form" autocomplete="off">
+          <label class="field-label" for="auth-username" data-i18n="username">Benutzername</label>
+          <input type="text" id="auth-username" data-i18n-ph="usernamePh" placeholder="z. B. mia_clips" maxlength="24" required>
+          <label class="field-label" for="auth-password" data-i18n="password">Passwort</label>
+          <input type="password" id="auth-password" placeholder="••••••••" minlength="4" required>
+          <p id="auth-error" class="auth-error"></p>
+          <button type="submit" id="auth-submit" class="btn-gradient" data-i18n="login">Anmelden</button>
+        </form>
+        <p class="auth-switch">
+          <span id="auth-switch-text" data-i18n="noAccount">Noch kein Konto?</span>
+          <button id="auth-toggle" type="button" data-i18n="register">Registrieren</button>
+        </p>
       </div>
-
-      <form id="auth-form" autocomplete="off">
-        <input type="text" id="auth-username" placeholder="Benutzername" maxlength="24" required>
-        <input type="password" id="auth-password" placeholder="Passwort" minlength="4" required>
-        <p id="auth-error" class="auth-error"></p>
-        <button type="submit" id="auth-submit" class="btn-primary">Anmelden</button>
-      </form>
     </div>
   </section>
 
@@ -42,7 +46,7 @@
         <button id="search-btn" title="Suche" aria-label="Suche">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5"/></svg>
         </button>
-        <input type="search" id="search-input" placeholder="Videos suchen…">
+        <input type="search" id="search-input" data-i18n-ph="searchPh" placeholder="Videos suchen…">
       </div>
     </header>
 
@@ -54,40 +58,98 @@
         <div id="feed-container"></div>
         <div id="feed-empty" class="empty-state hidden">
           <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="13" height="14" rx="2.5"/><path d="M16 10.5l5-3v9l-5-3"/></svg>
-          <p>Noch keine Videos vorhanden.</p>
-          <p>Lade das erste Short hoch!</p>
+          <p data-i18n="noVideos">Noch keine Videos vorhanden.</p>
+          <p data-i18n="uploadFirst">Lade das erste Short hoch!</p>
         </div>
       </section>
 
       <!-- SUCHE -->
       <section id="page-search" class="page">
-        <h2>Suche</h2>
+        <h2 data-i18n="searchTitle">Suche</h2>
         <div id="search-results" class="video-grid"></div>
         <div id="search-empty" class="empty-state hidden">
           <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5"/></svg>
-          <p>Keine Videos gefunden.</p>
+          <p data-i18n="noResults">Keine Videos gefunden.</p>
         </div>
       </section>
 
       <!-- UPLOAD -->
       <section id="page-upload" class="page">
-        <h2>Short hochladen</h2>
+        <h2 data-i18n="uploadTitle">Short hochladen</h2>
         <form id="upload-form">
           <label class="file-drop" id="video-drop">
             <input type="file" id="video-file" accept="video/*" hidden>
             <svg class="drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V7m0 0l-4 4m4-4l4 4"/><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
-            <span id="video-drop-text">Video auswählen (max. 1 Minute)</span>
+            <span id="video-drop-text" data-i18n="chooseVideo">Video auswählen (max. 1 Minute)</span>
           </label>
           <video id="upload-preview" class="hidden" controls muted playsinline></video>
-          <input type="text" id="video-title" placeholder="Videoname (für die Suche)" maxlength="60" required>
+          <input type="text" id="video-title" data-i18n-ph="videoNamePh" placeholder="Videoname (für die Suche)" maxlength="60" required>
+
+          <!-- FSK-12-Prüfung -->
+          <div class="fsk-box">
+            <h3>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 3.5v5.7c0 5-3.4 9.3-8 10.8-4.6-1.5-8-5.8-8-10.8V5.5L12 2z"/><path d="M9 12l2 2 4-4.5"/></svg>
+              <span data-i18n="fskTitle">FSK-12-Prüfung</span>
+            </h3>
+            <p data-i18n="fskInfo">Jedes Video wird vor der Veröffentlichung geprüft. Bestätige:</p>
+            <label><input type="checkbox" class="fsk-check"> <span data-i18n="fsk1">Keine Gewaltdarstellungen</span></label>
+            <label><input type="checkbox" class="fsk-check"> <span data-i18n="fsk2">Keine sexuellen oder anstößigen Inhalte</span></label>
+            <label><input type="checkbox" class="fsk-check"> <span data-i18n="fsk3">Keine Verherrlichung von Drogen, Alkohol oder Waffen</span></label>
+          </div>
+
           <p id="upload-error" class="auth-error"></p>
-          <button type="submit" class="btn-primary" id="upload-submit" disabled>Veröffentlichen</button>
+          <button type="submit" class="btn-gradient" id="upload-submit" disabled data-i18n="publish">Veröffentlichen</button>
         </form>
       </section>
 
       <!-- PROFIL -->
       <section id="page-profile" class="page">
         <div id="profile-content"></div>
+      </section>
+
+      <!-- EINSTELLUNGEN -->
+      <section id="page-settings" class="page">
+        <div class="settings-head">
+          <button id="settings-back" class="icon-btn" aria-label="Zurück">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+          </button>
+          <h2 data-i18n="settings">Einstellungen</h2>
+        </div>
+
+        <div class="settings-section">
+          <h3 data-i18n="profileSection">Profil</h3>
+          <label class="field-label" data-i18n="displayName">Anzeigename</label>
+          <input type="text" id="set-displayname" maxlength="30">
+          <button class="btn-secondary" id="save-displayname" data-i18n="save">Speichern</button>
+        </div>
+
+        <div class="settings-section">
+          <h3 data-i18n="accountSection">Konto</h3>
+          <label class="field-label" data-i18n="newUsername">Neuer Benutzername</label>
+          <input type="text" id="set-username" maxlength="24">
+          <button class="btn-secondary" id="save-username" data-i18n="save">Speichern</button>
+
+          <label class="field-label" style="margin-top:16px" data-i18n="changePassword">Passwort ändern</label>
+          <input type="password" id="set-pw-current" data-i18n-ph="currentPw" placeholder="Aktuelles Passwort">
+          <input type="password" id="set-pw-new" data-i18n-ph="newPw" placeholder="Neues Passwort" minlength="4">
+          <button class="btn-secondary" id="save-password" data-i18n="save">Speichern</button>
+        </div>
+
+        <div class="settings-section">
+          <h3 data-i18n="language">App-Sprache</h3>
+          <select id="set-language"></select>
+        </div>
+
+        <div class="settings-section">
+          <h3 data-i18n="codeTitle">Code einlösen</h3>
+          <div class="code-row">
+            <input type="text" id="set-code" data-i18n-ph="codePh" placeholder="Code eingeben">
+            <button class="btn-secondary" id="redeem-code" data-i18n="redeem">Einlösen</button>
+          </div>
+          <p id="code-status" class="verified-status hidden"></p>
+        </div>
+
+        <p id="settings-msg" class="settings-msg"></p>
       </section>
 
     </main>
@@ -105,7 +167,7 @@
       </button>
       <button class="nav-btn" data-page="profile" title="Profil">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4.2"/><path d="M4 20.5c0-3.6 3.6-6 8-6s8 2.4 8 6c0 .8-.7 1.5-1.5 1.5h-13C4.7 22 4 21.3 4 20.5z"/></svg>
-        <span class="nav-label">Profil</span>
+        <span class="nav-label" data-i18n="profileSection">Profil</span>
       </button>
     </nav>
   </div>
@@ -114,17 +176,21 @@
   <div id="comments-overlay" class="hidden">
     <div id="comments-panel">
       <div class="comments-header">
-        <h3 id="comments-title">Kommentare</h3>
+        <h3 id="comments-title" data-i18n="comments">Kommentare</h3>
         <button id="comments-close">✕</button>
       </div>
       <div id="comments-list"></div>
       <form id="comment-form">
-        <input type="text" id="comment-input" placeholder="Kommentar hinzufügen…" maxlength="200" required>
-        <button type="submit">Senden</button>
+        <input type="text" id="comment-input" data-i18n-ph="commentPh" placeholder="Kommentar hinzufügen…" maxlength="200" required>
+        <button type="submit" data-i18n="send">Senden</button>
       </form>
     </div>
   </div>
 
+  <!-- Toast-Meldungen -->
+  <div id="toast" class="hidden"></div>
+
+  <script src="i18n.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
