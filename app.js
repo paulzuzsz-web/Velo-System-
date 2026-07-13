@@ -260,6 +260,7 @@ function showPage(name) {
   $$('.page').forEach(p => p.classList.remove('active'));
   $('#page-' + name).classList.add('active');
   $$('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.page === name));
+  $('#app').classList.toggle('feed-mode', name === 'feed');
   pauseAllVideos();
   if (name === 'feed') feedReady = renderFeed();
   if (name === 'profile') renderProfile(profileViewUser || currentUser());
@@ -338,6 +339,10 @@ function buildShort(video) {
   vid.src = URL.createObjectURL(video.blob);
   vid.loop = true;
   vid.playsInline = true;
+  // Hochformat füllt den ganzen Bildschirm, Querformat wird eingepasst
+  vid.addEventListener('loadedmetadata', () => {
+    vid.style.objectFit = vid.videoHeight >= vid.videoWidth ? 'cover' : 'contain';
+  });
   vid.addEventListener('click', () => vid.paused ? vid.play() : vid.pause());
   el.appendChild(vid);
 
