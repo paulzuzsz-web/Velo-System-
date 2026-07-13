@@ -154,6 +154,7 @@ const ICONS = {
   heart: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.2c-.4 0-.7-.1-1-.4C7.5 17.8 2.5 14 2.5 9.4 2.5 6.4 4.9 4 7.9 4c1.6 0 3.1.7 4.1 1.9C13 4.7 14.5 4 16.1 4c3 0 5.4 2.4 5.4 5.4 0 4.6-5 8.4-8.5 11.4-.3.3-.6.4-1 .4z"/></svg>',
   comment: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5c-5.5 0-10 3.9-10 8.8 0 2.6 1.3 5 3.4 6.6-.2 1-.8 2.4-2 3.3-.3.2-.1.7.2.7 2.4 0 4.2-1.1 5.2-1.9 1 .3 2.1.5 3.2.5 5.5 0 10-3.9 10-8.8s-4.5-9.2-10-9.2z"/></svg>',
   share: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 3.5c0-.9 1.1-1.4 1.7-.7l7 6.5c.4.4.4 1 0 1.4l-7 6.5c-.6.7-1.7.2-1.7-.7v-3c-4.6 0-7.9 1.5-10.3 4.7-.5.6-1.4.2-1.3-.6C3.2 11.6 7.4 7.8 14 7.3v-3.8z"/></svg>',
+  eye: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5C6.7 5 2.6 9.1 1.2 11.5c-.2.3-.2.7 0 1C2.6 14.9 6.7 19 12 19s9.4-4.1 10.8-6.5c.2-.3.2-.7 0-1C21.4 9.1 17.3 5 12 5zm0 11a4 4 0 110-8 4 4 0 010 8zm0-2.2a1.8 1.8 0 100-3.6 1.8 1.8 0 000 3.6z"/></svg>',
   trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2"/></svg>',
   pencil: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 17.3V20h2.7L17.8 8.9l-2.7-2.7L4 17.3zM20.7 6c.4-.4.4-1 0-1.4l-1.3-1.3c-.4-.4-1-.4-1.4 0l-1.5 1.5 2.7 2.7L20.7 6z"/></svg>',
   gear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.6 1.6 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.6 1.6 0 00-1.8-.3 1.6 1.6 0 00-1 1.5V21a2 2 0 11-4 0v-.2a1.6 1.6 0 00-1-1.5 1.6 1.6 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.6 1.6 0 00.3-1.8 1.6 1.6 0 00-1.5-1H3a2 2 0 110-4h.2a1.6 1.6 0 001.5-1 1.6 1.6 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.6 1.6 0 001.8.3h.1a1.6 1.6 0 001-1.5V3a2 2 0 114 0v.2a1.6 1.6 0 001 1.5h.1a1.6 1.6 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.6 1.6 0 00-.3 1.8v.1a1.6 1.6 0 001.5 1h.2a2 2 0 110 4h-.2a1.6 1.6 0 00-1.5 1z"/></svg>',
@@ -315,6 +316,11 @@ async function renderFeed() {
       if (!vid) return;
       if (entry.isIntersecting && entry.intersectionRatio > 0.6) {
         vid.play().catch(() => {});
+        // Aufruf zählen – einmal pro Video und Feed-Durchlauf
+        if (!entry.target.dataset.viewed) {
+          entry.target.dataset.viewed = '1';
+          countView(entry.target.dataset.id, entry.target);
+        }
       } else {
         vid.pause();
       }
@@ -326,6 +332,16 @@ async function renderFeed() {
     container.appendChild(el);
     feedObserver.observe(el);
   });
+}
+
+async function countView(videoId, shortEl) {
+  const videos = await dbGetAllVideos();
+  const video = videos.find(v => v.id === videoId);
+  if (!video) return;
+  video.views = (video.views || 0) + 1;
+  await dbPutVideo(video);
+  const viewsEl = shortEl.querySelector('.views-display .count');
+  if (viewsEl) viewsEl.textContent = video.views;
 }
 
 function buildShort(video) {
@@ -419,6 +435,11 @@ function buildShort(video) {
     likeBtn.querySelector('.count').textContent = video.likes.length;
   });
 
+  // Aufrufe direkt unter den Likes
+  const viewsDisplay = document.createElement('div');
+  viewsDisplay.className = 'action-btn views-display';
+  viewsDisplay.innerHTML = `${ICONS.eye}<span class="count">${video.views || 0}</span>`;
+
   const commentBtn = document.createElement('button');
   commentBtn.className = 'action-btn comment-btn';
   commentBtn.innerHTML = `${ICONS.comment}<span class="count">${video.comments.length}</span>`;
@@ -429,7 +450,7 @@ function buildShort(video) {
   shareBtn.innerHTML = `${ICONS.share}<span class="count">${t('share')}</span>`;
   shareBtn.addEventListener('click', () => shareVideo(video));
 
-  actions.append(likeBtn, commentBtn, shareBtn);
+  actions.append(likeBtn, viewsDisplay, commentBtn, shareBtn);
   el.appendChild(actions);
   return el;
 }
@@ -596,6 +617,7 @@ $('#upload-form').addEventListener('submit', async e => {
     blob: uploadFile,
     likes: [],
     comments: [],
+    views: 0,
     fsk12Checked: true,
     ts: Date.now()
   };
@@ -665,7 +687,10 @@ function buildGridItem(video, { deletable = false } = {}) {
   const likes = document.createElement('div');
   likes.className = 'grid-likes';
   likes.innerHTML = ICONS.heart + ' ' + video.likes.length;
-  item.append(vid, title, likes);
+  const views = document.createElement('div');
+  views.className = 'grid-likes grid-views';
+  views.innerHTML = ICONS.eye + ' ' + (video.views || 0);
+  item.append(vid, title, likes, views);
 
   item.addEventListener('click', () => openSingleVideo(video.id));
 
