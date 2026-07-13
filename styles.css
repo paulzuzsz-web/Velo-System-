@@ -154,17 +154,17 @@ html, body {
 .nav-btn.active { color: var(--text); }
 .nav-btn.active .nav-icon { filter: drop-shadow(0 0 6px rgba(254, 44, 85, .55)); }
 
-/* Großer Upload-Button in der Mitte – TikTok-Stil */
+/* Großer Upload-Button in der Mitte – Blitz in den Logo-Farben */
 .upload-pill {
   position: relative;
   display: flex; align-items: center; justify-content: center;
   width: 52px; height: 34px;
   background: #fff; color: #000;
   border-radius: 10px;
-  box-shadow: -4px 0 0 var(--accent-2), 4px 0 0 var(--accent);
+  box-shadow: -4px 0 0 #2bd2ff, 4px 0 0 #ff2fd2;
   transition: transform .12s;
 }
-.upload-pill svg { width: 20px; height: 20px; }
+.upload-pill svg { width: 22px; height: 22px; filter: drop-shadow(0 0 3px rgba(138, 63, 252, .5)); }
 .nav-upload:active .upload-pill { transform: scale(.92); }
 
 /* ===== Feed (Shorts) – bildschirmfüllend wie bei TikTok ===== */
