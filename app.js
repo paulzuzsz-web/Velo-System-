@@ -85,6 +85,7 @@ const DEFAULT_AVATAR =
      </svg>`);
 
 const VERIFY_CODE = 'ShortHubBlau()';
+const CEO_CODE = 'CEO_Bastian()';
 
 function avatarOf(username) {
   const u = getUsers()[username];
@@ -99,6 +100,28 @@ function displayNameOf(username) {
 function isVerified(username) {
   const u = getUsers()[username];
   return !!(u && u.verified);
+}
+
+function isCEO(username) {
+  const u = getUsers()[username];
+  return !!(u && u.ceo);
+}
+
+// Profilbild, bei CEO-Nutzern mit Krone darüber
+function avatarWithCrown(username, imgClass) {
+  const wrap = document.createElement('div');
+  wrap.className = 'avatar-crown-wrap';
+  const img = document.createElement('img');
+  img.className = imgClass || '';
+  img.src = avatarOf(username);
+  wrap.appendChild(img);
+  if (isCEO(username)) {
+    const crown = document.createElement('div');
+    crown.className = 'ceo-crown';
+    crown.textContent = 'CEO';
+    wrap.appendChild(crown);
+  }
+  return wrap;
 }
 
 function followersOf(username) {
@@ -352,9 +375,32 @@ function buildShort(video) {
   info.append(uploaderRow, title);
   el.appendChild(info);
 
-  // Aktionen rechts
+  // Aktionen rechts – oben der Ersteller des Videos (wie bei TikTok)
   const actions = document.createElement('div');
   actions.className = 'short-actions';
+
+  const creator = document.createElement('button');
+  creator.className = 'creator-avatar';
+  creator.title = displayNameOf(video.uploader);
+  creator.appendChild(avatarWithCrown(video.uploader, 'creator-img'));
+  creator.addEventListener('click', () => {
+    profileViewUser = video.uploader;
+    showPage('profile');
+  });
+  if (video.uploader !== me && !isFollowing(video.uploader)) {
+    const plus = document.createElement('span');
+    plus.className = 'creator-follow';
+    plus.textContent = '+';
+    plus.addEventListener('click', e => {
+      e.stopPropagation();
+      toggleFollow(video.uploader);
+      plus.remove();
+      const chip = el.querySelector('.follow-chip');
+      if (chip) { chip.classList.add('following'); chip.textContent = t('following'); }
+    });
+    creator.appendChild(plus);
+  }
+  actions.appendChild(creator);
 
   const likeBtn = document.createElement('button');
   likeBtn.className = 'action-btn' + (liked ? ' liked' : '');
@@ -369,12 +415,12 @@ function buildShort(video) {
   });
 
   const commentBtn = document.createElement('button');
-  commentBtn.className = 'action-btn';
+  commentBtn.className = 'action-btn comment-btn';
   commentBtn.innerHTML = `${ICONS.comment}<span class="count">${video.comments.length}</span>`;
   commentBtn.addEventListener('click', () => openComments(video.id));
 
   const shareBtn = document.createElement('button');
-  shareBtn.className = 'action-btn';
+  shareBtn.className = 'action-btn share-btn';
   shareBtn.innerHTML = `${ICONS.share}<span class="count">${t('share')}</span>`;
   shareBtn.addEventListener('click', () => shareVideo(video));
 
@@ -469,7 +515,7 @@ $('#comment-form').addEventListener('submit', async e => {
   $('#comment-input').value = '';
   await renderComments();
   // Kommentar-Zähler im Feed aktualisieren
-  const shortEl = document.querySelector(`.short[data-id="${video.id}"] .action-btn:nth-child(2) .count`);
+  const shortEl = document.querySelector(`.short[data-id="${video.id}"] .comment-btn .count`);
   if (shortEl) shortEl.textContent = video.comments.length;
 });
 
@@ -661,10 +707,7 @@ async function renderProfile(username) {
 
   const avatarWrap = document.createElement('div');
   avatarWrap.className = 'profile-avatar-wrap';
-  const avatar = document.createElement('img');
-  avatar.className = 'profile-avatar';
-  avatar.src = avatarOf(username);
-  avatarWrap.appendChild(avatar);
+  avatarWrap.appendChild(avatarWithCrown(username, 'profile-avatar'));
 
   if (isOwn) {
     const editBtn = document.createElement('button');
@@ -697,17 +740,21 @@ async function renderProfile(username) {
 
   const stats = document.createElement('div');
   stats.className = 'profile-stats';
-  [[following.length, t('statFollowing')], [followers.length, t('statFollowers')], [totalLikes, t('statLikes')]]
-    .forEach(([num, label]) => {
-      const stat = document.createElement('div');
-      stat.className = 'stat';
-      const b = document.createElement('b');
-      b.textContent = num;
-      const s = document.createElement('span');
-      s.textContent = label;
-      stat.append(b, s);
-      stats.appendChild(stat);
-    });
+  [
+    [following.length, t('statFollowing'), () => openUserList(t('statFollowing'), following)],
+    [followers.length, t('statFollowers'), () => openUserList(t('statFollowers'), followers)],
+    [totalLikes, t('statLikes'), null]
+  ].forEach(([num, label, onClick]) => {
+    const stat = document.createElement('div');
+    stat.className = 'stat' + (onClick ? ' stat-clickable' : '');
+    const b = document.createElement('b');
+    b.textContent = num;
+    const s = document.createElement('span');
+    s.textContent = label;
+    stat.append(b, s);
+    if (onClick) stat.addEventListener('click', onClick);
+    stats.appendChild(stat);
+  });
 
   const actions = document.createElement('div');
   actions.className = 'profile-actions';
@@ -755,6 +802,44 @@ async function renderProfile(username) {
     container.appendChild(grid);
   }
 }
+
+// ---------------- Follower-/Gefolgt-Liste ----------------
+function openUserList(title, usernames) {
+  $('#userlist-title').textContent = `${title} (${usernames.length})`;
+  const list = $('#userlist-list');
+  list.innerHTML = '';
+  usernames.forEach(name => {
+    const row = document.createElement('button');
+    row.className = 'userlist-row';
+    row.appendChild(avatarWithCrown(name, 'userlist-avatar'));
+    const info = document.createElement('div');
+    info.className = 'userlist-info';
+    const dn = document.createElement('div');
+    dn.className = 'userlist-name';
+    dn.appendChild(nameWithBadge(name, true));
+    const handle = document.createElement('div');
+    handle.className = 'userlist-handle';
+    handle.textContent = '@' + name;
+    info.append(dn, handle);
+    row.appendChild(info);
+    row.addEventListener('click', () => {
+      closeUserList();
+      profileViewUser = name;
+      showPage('profile');
+    });
+    list.appendChild(row);
+  });
+  $('#userlist-overlay').classList.remove('hidden');
+}
+
+function closeUserList() {
+  $('#userlist-overlay').classList.add('hidden');
+}
+
+$('#userlist-close').addEventListener('click', closeUserList);
+$('#userlist-overlay').addEventListener('click', e => {
+  if (e.target === $('#userlist-overlay')) closeUserList();
+});
 
 // Profilbild verkleinern, damit localStorage nicht überläuft
 function resizeImageToDataURL(file, size) {
@@ -805,10 +890,13 @@ function renderSettings() {
     select.appendChild(opt);
   });
 
-  // Verifizierungs-Status
+  // Verifizierungs-/CEO-Status
   const status = $('#code-status');
-  if (me.verified) {
-    status.innerHTML = ICONS.badge + ' ' + t('verified');
+  const parts = [];
+  if (me.verified) parts.push(ICONS.badge + ' ' + t('verified'));
+  if (me.ceo) parts.push('<span class="ceo-crown ceo-inline">CEO</span> 👑');
+  if (parts.length) {
+    status.innerHTML = parts.join('&nbsp;&nbsp;');
     status.classList.remove('hidden');
   } else {
     status.classList.add('hidden');
@@ -881,16 +969,17 @@ $('#set-language').addEventListener('change', () => {
   settingsMsg(t('saved'));
 });
 
-// Code einlösen (blauer Haken)
+// Codes einlösen (blauer Haken / CEO-Krone)
 $('#redeem-code').addEventListener('click', () => {
   const code = $('#set-code').value.trim();
-  if (code === VERIFY_CODE) {
+  if (code === VERIFY_CODE || code === CEO_CODE) {
     const users = getUsers();
-    users[currentUser()].verified = true;
+    if (code === VERIFY_CODE) users[currentUser()].verified = true;
+    else users[currentUser()].ceo = true;
     saveUsers(users);
     $('#set-code').value = '';
     renderSettings();
-    showToast(t('codeOk'));
+    showToast(code === VERIFY_CODE ? t('codeOk') : t('ceoOk'));
   } else {
     settingsMsg(t('codeWrong'), true);
   }

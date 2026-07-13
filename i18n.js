@@ -42,7 +42,7 @@ de: {
   currentPw: 'Aktuelles Passwort', newPw: 'Neues Passwort', language: 'App-Sprache',
   save: 'Speichern', saved: 'Gespeichert ✓', wrongPw: 'Aktuelles Passwort ist falsch.',
   codeTitle: 'Code einlösen', codePh: 'Code eingeben', redeem: 'Einlösen',
-  codeOk: 'Blauer Haken aktiviert! ✓', codeWrong: 'Ungültiger Code.',
+  codeOk: 'Blauer Haken aktiviert! ✓', ceoOk: 'CEO-Krone aktiviert! 👑', codeWrong: 'Ungültiger Code.',
   verified: 'Verifiziert', back: 'Zurück'
 },
 en: {
@@ -76,7 +76,7 @@ en: {
   currentPw: 'Current password', newPw: 'New password', language: 'App language',
   save: 'Save', saved: 'Saved ✓', wrongPw: 'Current password is incorrect.',
   codeTitle: 'Redeem code', codePh: 'Enter code', redeem: 'Redeem',
-  codeOk: 'Blue checkmark activated! ✓', codeWrong: 'Invalid code.',
+  codeOk: 'Blue checkmark activated! ✓', ceoOk: 'CEO crown activated! 👑', codeWrong: 'Invalid code.',
   verified: 'Verified', back: 'Back'
 },
 es: {
@@ -110,7 +110,7 @@ es: {
   currentPw: 'Contraseña actual', newPw: 'Nueva contraseña', language: 'Idioma de la app',
   save: 'Guardar', saved: 'Guardado ✓', wrongPw: 'La contraseña actual es incorrecta.',
   codeTitle: 'Canjear código', codePh: 'Introducir código', redeem: 'Canjear',
-  codeOk: '¡Insignia azul activada! ✓', codeWrong: 'Código no válido.',
+  codeOk: '¡Insignia azul activada! ✓', ceoOk: '¡Corona CEO activada! 👑', codeWrong: 'Código no válido.',
   verified: 'Verificado', back: 'Atrás'
 },
 fr: {
@@ -144,7 +144,7 @@ fr: {
   currentPw: 'Mot de passe actuel', newPw: 'Nouveau mot de passe', language: "Langue de l'app",
   save: 'Enregistrer', saved: 'Enregistré ✓', wrongPw: 'Le mot de passe actuel est incorrect.',
   codeTitle: 'Utiliser un code', codePh: 'Saisir le code', redeem: 'Valider',
-  codeOk: 'Badge bleu activé ! ✓', codeWrong: 'Code invalide.',
+  codeOk: 'Badge bleu activé ! ✓', ceoOk: 'Couronne CEO activée ! 👑', codeWrong: 'Code invalide.',
   verified: 'Vérifié', back: 'Retour'
 },
 it: {
@@ -178,7 +178,7 @@ it: {
   currentPw: 'Password attuale', newPw: 'Nuova password', language: "Lingua dell'app",
   save: 'Salva', saved: 'Salvato ✓', wrongPw: 'La password attuale è errata.',
   codeTitle: 'Riscatta codice', codePh: 'Inserisci codice', redeem: 'Riscatta',
-  codeOk: 'Spunta blu attivata! ✓', codeWrong: 'Codice non valido.',
+  codeOk: 'Spunta blu attivata! ✓', ceoOk: 'Corona CEO attivata! 👑', codeWrong: 'Codice non valido.',
   verified: 'Verificato', back: 'Indietro'
 },
 pt: {
@@ -212,7 +212,7 @@ pt: {
   currentPw: 'Senha atual', newPw: 'Nova senha', language: 'Idioma do app',
   save: 'Salvar', saved: 'Salvo ✓', wrongPw: 'A senha atual está incorreta.',
   codeTitle: 'Resgatar código', codePh: 'Digite o código', redeem: 'Resgatar',
-  codeOk: 'Selo azul ativado! ✓', codeWrong: 'Código inválido.',
+  codeOk: 'Selo azul ativado! ✓', ceoOk: 'Coroa CEO ativada! 👑', codeWrong: 'Código inválido.',
   verified: 'Verificado', back: 'Voltar'
 },
 nl: {
@@ -246,7 +246,7 @@ nl: {
   currentPw: 'Huidig wachtwoord', newPw: 'Nieuw wachtwoord', language: 'App-taal',
   save: 'Opslaan', saved: 'Opgeslagen ✓', wrongPw: 'Het huidige wachtwoord is onjuist.',
   codeTitle: 'Code inwisselen', codePh: 'Code invoeren', redeem: 'Inwisselen',
-  codeOk: 'Blauw vinkje geactiveerd! ✓', codeWrong: 'Ongeldige code.',
+  codeOk: 'Blauw vinkje geactiveerd! ✓', ceoOk: 'CEO-kroon geactiveerd! 👑', codeWrong: 'Ongeldige code.',
   verified: 'Geverifieerd', back: 'Terug'
 },
 pl: {
@@ -280,7 +280,7 @@ pl: {
   currentPw: 'Obecne hasło', newPw: 'Nowe hasło', language: 'Język aplikacji',
   save: 'Zapisz', saved: 'Zapisano ✓', wrongPw: 'Obecne hasło jest nieprawidłowe.',
   codeTitle: 'Wykorzystaj kod', codePh: 'Wpisz kod', redeem: 'Wykorzystaj',
-  codeOk: 'Niebieski znaczek aktywowany! ✓', codeWrong: 'Nieprawidłowy kod.',
+  codeOk: 'Niebieski znaczek aktywowany! ✓', ceoOk: 'Korona CEO aktywowana! 👑', codeWrong: 'Nieprawidłowy kod.',
   verified: 'Zweryfikowany', back: 'Wstecz'
 },
 tr: {
@@ -314,7 +314,7 @@ tr: {
   currentPw: 'Mevcut şifre', newPw: 'Yeni şifre', language: 'Uygulama dili',
   save: 'Kaydet', saved: 'Kaydedildi ✓', wrongPw: 'Mevcut şifre yanlış.',
   codeTitle: 'Kod kullan', codePh: 'Kodu gir', redeem: 'Kullan',
-  codeOk: 'Mavi tik etkinleştirildi! ✓', codeWrong: 'Geçersiz kod.',
+  codeOk: 'Mavi tik etkinleştirildi! ✓', ceoOk: 'CEO tacı etkinleştirildi! 👑', codeWrong: 'Geçersiz kod.',
   verified: 'Doğrulanmış', back: 'Geri'
 },
 ru: {
@@ -348,7 +348,7 @@ ru: {
   currentPw: 'Текущий пароль', newPw: 'Новый пароль', language: 'Язык приложения',
   save: 'Сохранить', saved: 'Сохранено ✓', wrongPw: 'Текущий пароль неверен.',
   codeTitle: 'Активировать код', codePh: 'Введи код', redeem: 'Активировать',
-  codeOk: 'Синяя галочка активирована! ✓', codeWrong: 'Неверный код.',
+  codeOk: 'Синяя галочка активирована! ✓', ceoOk: 'Корона CEO активирована! 👑', codeWrong: 'Неверный код.',
   verified: 'Подтверждено', back: 'Назад'
 },
 ar: {
@@ -382,7 +382,7 @@ ar: {
   currentPw: 'كلمة المرور الحالية', newPw: 'كلمة المرور الجديدة', language: 'لغة التطبيق',
   save: 'حفظ', saved: 'تم الحفظ ✓', wrongPw: 'كلمة المرور الحالية غير صحيحة.',
   codeTitle: 'استخدام رمز', codePh: 'أدخل الرمز', redeem: 'استخدام',
-  codeOk: 'تم تفعيل العلامة الزرقاء! ✓', codeWrong: 'رمز غير صالح.',
+  codeOk: 'تم تفعيل العلامة الزرقاء! ✓', ceoOk: 'تم تفعيل تاج CEO! 👑', codeWrong: 'رمز غير صالح.',
   verified: 'موثّق', back: 'رجوع'
 },
 hi: {
@@ -416,7 +416,7 @@ hi: {
   currentPw: 'वर्तमान पासवर्ड', newPw: 'नया पासवर्ड', language: 'ऐप की भाषा',
   save: 'सहेजें', saved: 'सहेजा गया ✓', wrongPw: 'वर्तमान पासवर्ड गलत है।',
   codeTitle: 'कोड रिडीम करें', codePh: 'कोड दर्ज करें', redeem: 'रिडीम करें',
-  codeOk: 'नीला टिक सक्रिय! ✓', codeWrong: 'अमान्य कोड।',
+  codeOk: 'नीला टिक सक्रिय! ✓', ceoOk: 'CEO मुकुट सक्रिय! 👑', codeWrong: 'अमान्य कोड।',
   verified: 'सत्यापित', back: 'वापस'
 },
 zh: {
@@ -450,7 +450,7 @@ zh: {
   currentPw: '当前密码', newPw: '新密码', language: '应用语言',
   save: '保存', saved: '已保存 ✓', wrongPw: '当前密码错误。',
   codeTitle: '兑换代码', codePh: '输入代码', redeem: '兑换',
-  codeOk: '蓝V已激活！✓', codeWrong: '无效的代码。',
+  codeOk: '蓝V已激活！✓', ceoOk: 'CEO皇冠已激活！👑', codeWrong: '无效的代码。',
   verified: '已认证', back: '返回'
 },
 ja: {
@@ -484,7 +484,7 @@ ja: {
   currentPw: '現在のパスワード', newPw: '新しいパスワード', language: 'アプリの言語',
   save: '保存', saved: '保存しました ✓', wrongPw: '現在のパスワードが違います。',
   codeTitle: 'コードを使う', codePh: 'コードを入力', redeem: '適用',
-  codeOk: '青いチェックマークが有効に！✓', codeWrong: '無効なコードです。',
+  codeOk: '青いチェックマークが有効に！✓', ceoOk: 'CEOクラウンが有効に！👑', codeWrong: '無効なコードです。',
   verified: '認証済み', back: '戻る'
 },
 ko: {
@@ -518,7 +518,7 @@ ko: {
   currentPw: '현재 비밀번호', newPw: '새 비밀번호', language: '앱 언어',
   save: '저장', saved: '저장됨 ✓', wrongPw: '현재 비밀번호가 틀렸습니다.',
   codeTitle: '코드 사용', codePh: '코드 입력', redeem: '사용',
-  codeOk: '파란 체크가 활성화되었습니다! ✓', codeWrong: '잘못된 코드입니다.',
+  codeOk: '파란 체크가 활성화되었습니다! ✓', ceoOk: 'CEO 왕관 활성화! 👑', codeWrong: '잘못된 코드입니다.',
   verified: '인증됨', back: '뒤로'
 }
 };

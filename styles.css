@@ -294,6 +294,73 @@ html, body {
 .btn-secondary:hover { border-color: var(--text-dim); }
 .profile-section-title { margin: 18px 0 10px; font-size: 1rem; color: var(--text-dim); }
 
+/* ===== CEO-Krone ===== */
+.avatar-crown-wrap { position: relative; display: inline-block; }
+.ceo-crown {
+  position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+  width: 46px; height: 24px;
+  background: linear-gradient(180deg, #ffe27a 0%, #f5b915 60%, #d99400 100%);
+  clip-path: polygon(6% 100%, 94% 100%, 100% 18%, 74% 46%, 50% 4%, 26% 46%, 0% 18%);
+  color: #5c3a00; font-size: 9px; font-weight: 800; letter-spacing: .5px;
+  display: flex; align-items: flex-end; justify-content: center;
+  padding-bottom: 3px;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,.6));
+  pointer-events: none;
+  z-index: 2;
+}
+.creator-img + .ceo-crown, .userlist-avatar + .ceo-crown {
+  width: 30px; height: 16px; top: -10px; font-size: 6.5px; padding-bottom: 2px;
+}
+.ceo-crown.ceo-inline {
+  position: static; transform: none; display: inline-flex;
+  vertical-align: middle;
+}
+
+/* ===== Ersteller-Avatar an der Video-Seitenleiste (wie TikTok) ===== */
+.creator-avatar {
+  position: relative; border: none; background: none; cursor: pointer;
+  margin-bottom: 4px; padding-top: 12px;
+}
+.creator-img {
+  width: 46px; height: 46px; border-radius: 50%; object-fit: cover;
+  border: 2px solid #fff;
+  filter: drop-shadow(0 1px 4px rgba(0,0,0,.6));
+}
+.creator-follow {
+  position: absolute; left: 50%; bottom: -8px; transform: translateX(-50%);
+  width: 19px; height: 19px; border-radius: 50%;
+  background: var(--accent); color: #fff;
+  font-size: 14px; font-weight: 700; line-height: 18px;
+  border: 2px solid #000;
+}
+
+/* ===== Follower-/Gefolgt-Liste ===== */
+#userlist-overlay {
+  position: fixed; inset: 0; z-index: 90;
+  background: rgba(0,0,0,.6);
+  display: flex; align-items: flex-end; justify-content: center;
+}
+#userlist-panel {
+  width: 100%; max-width: 480px; max-height: 70vh; min-height: 220px;
+  background: var(--surface);
+  border-radius: 16px 16px 0 0;
+  display: flex; flex-direction: column;
+  border: 1px solid var(--border); border-bottom: none;
+}
+#userlist-list { flex: 1; overflow-y: auto; padding: 8px 10px calc(14px + env(safe-area-inset-bottom)); }
+.userlist-row {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%; padding: 9px 8px;
+  border: none; background: none; color: var(--text);
+  border-radius: 10px; cursor: pointer; text-align: left;
+}
+.userlist-row:hover { background: var(--surface-2); }
+.userlist-avatar { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; }
+.userlist-name { font-weight: 700; font-size: .95rem; }
+.userlist-handle { font-size: .8rem; color: var(--text-dim); }
+.stat-clickable { cursor: pointer; }
+.stat-clickable:hover b { color: var(--accent-2); }
+
 /* ===== Blauer Haken ===== */
 .name-with-badge { display: inline-flex; align-items: center; gap: 4px; }
 .verified-badge { width: 16px; height: 16px; flex-shrink: 0; }
