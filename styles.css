@@ -127,16 +127,22 @@ html, body {
 .page.active { display: block; }
 .page h2 { margin-bottom: 16px; font-size: 1.2rem; }
 
-/* Im Feed liegen Kopf- und Fußleiste durchsichtig ÜBER dem Video (wie TikTok) */
+/* Im Feed liegen Kopf- und Fußleiste durchsichtig ÜBER dem Video (wie TikTok).
+   pointer-events: durchsichtige Flächen dürfen Tipps aufs Video/Herz nicht schlucken. */
 .feed-mode #topbar {
   background: linear-gradient(180deg, rgba(0,0,0,.55) 0%, transparent 100%);
   border-bottom: none;
   backdrop-filter: none;
+  pointer-events: none;
 }
+.feed-mode #topbar .logo,
+.feed-mode #topbar #search-wrap { pointer-events: auto; }
 .feed-mode #bottombar {
   background: linear-gradient(0deg, rgba(0,0,0,.6) 0%, transparent 100%);
   border-top: none;
+  pointer-events: none;
 }
+.feed-mode #bottombar .nav-btn { pointer-events: auto; }
 
 #bottombar {
   position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottombar-h);
@@ -184,7 +190,7 @@ html, body {
 }
 .short-info {
   position: absolute; left: 12px; right: 80px;
-  bottom: calc(var(--bottombar-h) + 16px);
+  bottom: calc(var(--bottombar-h) + 16px + env(safe-area-inset-bottom));
   text-shadow: 0 1px 4px rgba(0,0,0,.8);
 }
 .short-info .uploader {
@@ -195,7 +201,7 @@ html, body {
 .short-info .video-title { font-size: .95rem; color: #eee; }
 .short-actions {
   position: absolute; right: 10px;
-  bottom: calc(var(--bottombar-h) + 24px);
+  bottom: calc(var(--bottombar-h) + 24px + env(safe-area-inset-bottom));
   display: flex; flex-direction: column; gap: 18px; align-items: center;
 }
 .action-btn {
