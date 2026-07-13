@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Short Hub</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🎬</text></svg>">
+</head>
+<body>
+
+  <!-- ========== AUTH (Login / Registrieren) ========== -->
+  <section id="auth-screen" class="screen">
+    <div class="auth-box">
+      <h1 class="logo">🎬 Short<span>Hub</span></h1>
+      <p class="auth-subtitle">Kurze Videos. Große Momente.</p>
+
+      <div class="auth-tabs">
+        <button id="tab-login" class="auth-tab active">Anmelden</button>
+        <button id="tab-register" class="auth-tab">Registrieren</button>
+      </div>
+
+      <form id="auth-form" autocomplete="off">
+        <input type="text" id="auth-username" placeholder="Benutzername" maxlength="24" required>
+        <input type="password" id="auth-password" placeholder="Passwort" minlength="4" required>
+        <p id="auth-error" class="auth-error"></p>
+        <button type="submit" id="auth-submit" class="btn-primary">Anmelden</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ========== HAUPT-APP ========== -->
+  <div id="app" class="hidden">
+
+    <!-- Kopfzeile -->
+    <header id="topbar">
+      <span class="logo small">🎬 Short<span>Hub</span></span>
+      <div id="search-wrap">
+        <input type="search" id="search-input" placeholder="Videos suchen…">
+      </div>
+    </header>
+
+    <!-- Seiten-Container -->
+    <main id="pages">
+
+      <!-- FEED (Shorts) -->
+      <section id="page-feed" class="page active">
+        <div id="feed-container"></div>
+        <div id="feed-empty" class="empty-state hidden">
+          <p>🎥</p>
+          <p>Noch keine Videos vorhanden.</p>
+          <p>Lade das erste Short hoch!</p>
+        </div>
+      </section>
+
+      <!-- SUCHE -->
+      <section id="page-search" class="page">
+        <h2>Suche</h2>
+        <div id="search-results" class="video-grid"></div>
+        <div id="search-empty" class="empty-state hidden">
+          <p>🔍</p>
+          <p>Keine Videos gefunden.</p>
+        </div>
+      </section>
+
+      <!-- UPLOAD -->
+      <section id="page-upload" class="page">
+        <h2>Short hochladen</h2>
+        <form id="upload-form">
+          <label class="file-drop" id="video-drop">
+            <input type="file" id="video-file" accept="video/*" hidden>
+            <span id="video-drop-text">📼 Video auswählen (max. 1 Minute)</span>
+          </label>
+          <video id="upload-preview" class="hidden" controls muted playsinline></video>
+          <input type="text" id="video-title" placeholder="Videoname (für die Suche)" maxlength="60" required>
+          <p id="upload-error" class="auth-error"></p>
+          <button type="submit" class="btn-primary" id="upload-submit" disabled>Veröffentlichen</button>
+        </form>
+      </section>
+
+      <!-- PROFIL -->
+      <section id="page-profile" class="page">
+        <div id="profile-content"></div>
+      </section>
+
+    </main>
+
+    <!-- Untere Navigation -->
+    <nav id="bottombar">
+      <button class="nav-btn active" data-page="feed" title="Shorts">
+        <span class="nav-icon">▶️</span><span class="nav-label">Shorts</span>
+      </button>
+      <button class="nav-btn" data-page="search" title="Suche">
+        <span class="nav-icon">🔍</span><span class="nav-label">Suche</span>
+      </button>
+      <button class="nav-btn nav-upload" data-page="upload" title="Hochladen">
+        <span class="nav-icon">➕</span>
+      </button>
+      <button class="nav-btn" data-page="profile" title="Profil">
+        <span class="nav-icon">👤</span><span class="nav-label">Profil</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Kommentar-Panel -->
+  <div id="comments-overlay" class="hidden">
+    <div id="comments-panel">
+      <div class="comments-header">
+        <h3 id="comments-title">Kommentare</h3>
+        <button id="comments-close">✕</button>
+      </div>
+      <div id="comments-list"></div>
+      <form id="comment-form">
+        <input type="text" id="comment-input" placeholder="Kommentar hinzufügen…" maxlength="200" required>
+        <button type="submit">Senden</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
