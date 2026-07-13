@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Short Hub</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/png" href="logo-icon.png">
+</head>
+<body>
+
+  <!-- ========== AUTH (Login / Registrieren) ========== -->
+  <section id="auth-screen" class="screen">
+    <div class="auth-box">
+      <img src="logo.png" alt="Short Hub" class="auth-logo">
+      <p class="auth-subtitle">Kurze Videos. Große Momente.</p>
+
+      <div class="auth-tabs">
+        <button id="tab-login" class="auth-tab active">Anmelden</button>
+        <button id="tab-register" class="auth-tab">Registrieren</button>
+      </div>
+
+      <form id="auth-form" autocomplete="off">
+        <input type="text" id="auth-username" placeholder="Benutzername" maxlength="24" required>
+        <input type="password" id="auth-password" placeholder="Passwort" minlength="4" required>
+        <p id="auth-error" class="auth-error"></p>
+        <button type="submit" id="auth-submit" class="btn-primary">Anmelden</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ========== HAUPT-APP ========== -->
+  <div id="app" class="hidden">
+
+    <!-- Kopfzeile -->
+    <header id="topbar">
+      <span class="logo small">
+        <img src="logo-icon.png" alt="" class="topbar-logo">
+        Short<span>Hub</span>
+      </span>
+      <div id="search-wrap">
+        <button id="search-btn" title="Suche" aria-label="Suche">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5"/></svg>
+        </button>
+        <input type="search" id="search-input" placeholder="Videos suchen…">
+      </div>
+    </header>
+
+    <!-- Seiten-Container -->
+    <main id="pages">
+
+      <!-- FEED (Shorts) -->
+      <section id="page-feed" class="page active">
+        <div id="feed-container"></div>
+        <div id="feed-empty" class="empty-state hidden">
+          <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="13" height="14" rx="2.5"/><path d="M16 10.5l5-3v9l-5-3"/></svg>
+          <p>Noch keine Videos vorhanden.</p>
+          <p>Lade das erste Short hoch!</p>
+        </div>
+      </section>
+
+      <!-- SUCHE -->
+      <section id="page-search" class="page">
+        <h2>Suche</h2>
+        <div id="search-results" class="video-grid"></div>
+        <div id="search-empty" class="empty-state hidden">
+          <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5"/></svg>
+          <p>Keine Videos gefunden.</p>
+        </div>
+      </section>
+
+      <!-- UPLOAD -->
+      <section id="page-upload" class="page">
+        <h2>Short hochladen</h2>
+        <form id="upload-form">
+          <label class="file-drop" id="video-drop">
+            <input type="file" id="video-file" accept="video/*" hidden>
+            <svg class="drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V7m0 0l-4 4m4-4l4 4"/><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+            <span id="video-drop-text">Video auswählen (max. 1 Minute)</span>
+          </label>
+          <video id="upload-preview" class="hidden" controls muted playsinline></video>
+          <input type="text" id="video-title" placeholder="Videoname (für die Suche)" maxlength="60" required>
+          <p id="upload-error" class="auth-error"></p>
+          <button type="submit" class="btn-primary" id="upload-submit" disabled>Veröffentlichen</button>
+        </form>
+      </section>
+
+      <!-- PROFIL -->
+      <section id="page-profile" class="page">
+        <div id="profile-content"></div>
+      </section>
+
+    </main>
+
+    <!-- Untere Navigation: Upload groß in der Mitte (wie bei TikTok) -->
+    <nav id="bottombar">
+      <button class="nav-btn active" data-page="feed" title="Shorts">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M6.5 4.6c0-1.2 1.3-1.9 2.3-1.3l11 6.9c1 .6 1 2 0 2.6l-11 6.9c-1 .6-2.3-.1-2.3-1.3V4.6z"/></svg>
+        <span class="nav-label">Shorts</span>
+      </button>
+      <button class="nav-btn nav-upload" data-page="upload" title="Video hochladen" aria-label="Video hochladen">
+        <span class="upload-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </span>
+      </button>
+      <button class="nav-btn" data-page="profile" title="Profil">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4.2"/><path d="M4 20.5c0-3.6 3.6-6 8-6s8 2.4 8 6c0 .8-.7 1.5-1.5 1.5h-13C4.7 22 4 21.3 4 20.5z"/></svg>
+        <span class="nav-label">Profil</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Kommentar-Panel -->
+  <div id="comments-overlay" class="hidden">
+    <div id="comments-panel">
+      <div class="comments-header">
+        <h3 id="comments-title">Kommentare</h3>
+        <button id="comments-close">✕</button>
+      </div>
+      <div id="comments-list"></div>
+      <form id="comment-form">
+        <input type="text" id="comment-input" placeholder="Kommentar hinzufügen…" maxlength="200" required>
+        <button type="submit">Senden</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
