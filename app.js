@@ -44,6 +44,26 @@ function dbPutVideo(video) {
   });
 }
 
+// Ein Video atomar lesen, ändern und zurückschreiben – verhindert, dass
+// sich Like-, Kommentar- und Aufruf-Updates gegenseitig überschreiben.
+function dbUpdateVideo(id, mutate) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('videos', 'readwrite');
+    const store = tx.objectStore('videos');
+    const req = store.get(id);
+    let result = null;
+    req.onsuccess = () => {
+      const v = req.result;
+      if (!v) return;
+      mutate(v);
+      result = v;
+      store.put(v);
+    };
+    tx.oncomplete = () => resolve(result);
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
 function dbDeleteVideo(id) {
   return new Promise((resolve, reject) => {
     const tx = db.transaction('videos', 'readwrite');
@@ -335,13 +355,10 @@ async function renderFeed() {
 }
 
 async function countView(videoId, shortEl) {
-  const videos = await dbGetAllVideos();
-  const video = videos.find(v => v.id === videoId);
-  if (!video) return;
-  video.views = (video.views || 0) + 1;
-  await dbPutVideo(video);
+  const updated = await dbUpdateVideo(videoId, v => { v.views = (v.views || 0) + 1; });
+  if (!updated) return;
   const viewsEl = shortEl.querySelector('.views-display .count');
-  if (viewsEl) viewsEl.textContent = video.views;
+  if (viewsEl) viewsEl.textContent = updated.views;
 }
 
 function buildShort(video) {
@@ -427,12 +444,15 @@ function buildShort(video) {
   likeBtn.className = 'action-btn' + (liked ? ' liked' : '');
   likeBtn.innerHTML = `${ICONS.heart}<span class="count">${video.likes.length}</span>`;
   likeBtn.addEventListener('click', async () => {
-    const i = video.likes.indexOf(me);
-    if (i >= 0) video.likes.splice(i, 1);
-    else video.likes.push(me);
-    await dbPutVideo(video);
-    likeBtn.classList.toggle('liked', video.likes.includes(me));
-    likeBtn.querySelector('.count').textContent = video.likes.length;
+    const updated = await dbUpdateVideo(video.id, v => {
+      const i = v.likes.indexOf(me);
+      if (i >= 0) v.likes.splice(i, 1);
+      else v.likes.push(me);
+    });
+    if (!updated) return;
+    video.likes = updated.likes;
+    likeBtn.classList.toggle('liked', updated.likes.includes(me));
+    likeBtn.querySelector('.count').textContent = updated.likes.length;
   });
 
   // Aufrufe direkt unter den Likes
@@ -533,16 +553,15 @@ $('#comment-form').addEventListener('submit', async e => {
   e.preventDefault();
   const text = $('#comment-input').value.trim();
   if (!text || !activeCommentVideoId) return;
-  const videos = await dbGetAllVideos();
-  const video = videos.find(v => v.id === activeCommentVideoId);
-  if (!video) return;
-  video.comments.push({ user: currentUser(), text, ts: Date.now() });
-  await dbPutVideo(video);
+  const updated = await dbUpdateVideo(activeCommentVideoId, v => {
+    v.comments.push({ user: currentUser(), text, ts: Date.now() });
+  });
+  if (!updated) return;
   $('#comment-input').value = '';
   await renderComments();
   // Kommentar-Zähler im Feed aktualisieren
-  const shortEl = document.querySelector(`.short[data-id="${video.id}"] .comment-btn .count`);
-  if (shortEl) shortEl.textContent = video.comments.length;
+  const shortEl = document.querySelector(`.short[data-id="${updated.id}"] .comment-btn .count`);
+  if (shortEl) shortEl.textContent = updated.comments.length;
 });
 
 // ---------------- Upload (mit FSK-12-Prüfung) ----------------
@@ -604,6 +623,7 @@ $('#upload-form').addEventListener('submit', async e => {
   await new Promise(r => setTimeout(r, 1800));
   if (uploadDuration > 60.5) { // Sicherheitsnetz
     submitBtn.textContent = originalText;
+    submitBtn.disabled = false;
     errEl.textContent = t('tooLong');
     return;
   }
