@@ -66,6 +66,8 @@
       <!-- SUCHE -->
       <section id="page-search" class="page">
         <h2 data-i18n="searchTitle">Suche</h2>
+        <h3 id="account-results-title" class="search-section-title hidden" data-i18n="accounts">Konten</h3>
+        <div id="account-results"></div>
         <div id="search-results" class="video-grid"></div>
         <div id="search-empty" class="empty-state hidden">
           <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5"/></svg>
@@ -210,6 +212,8 @@
   <!-- Toast-Meldungen -->
   <div id="toast" class="hidden"></div>
 
+  <script src="config.js"></script>
+  <script src="backend.js"></script>
   <script src="i18n.js"></script>
   <script src="app.js"></script>
 </body>

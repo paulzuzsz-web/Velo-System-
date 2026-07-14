@@ -19,19 +19,34 @@ Eine Social-Media-Website im Stil von TikTok – als statische Web-App, bereit f
 2. Ziehe diesen Projektordner per Drag & Drop auf „Sites" (oder verbinde das GitHub-Repo)
 3. Fertig – keine Build-Einstellungen nötig, es ist eine rein statische Seite.
 
-## Wichtiger Hinweis zur Datenspeicherung
+## 🌍 Videos für ALLE sichtbar machen (Supabase einrichten – kostenlos, 5 Minuten)
 
-Netlify hostet nur statische Dateien – es gibt **keinen Server und keine Datenbank**.
-Deshalb werden alle Daten (Konten, Videos, Likes, Kommentare, Follower) **lokal im
-Browser** gespeichert (IndexedDB und localStorage):
+Damit hochgeladene Videos **auf jedem Gerät für jeden Nutzer** sichtbar sind
+(auch wenn der Ersteller offline oder abgemeldet ist), braucht die Seite einen
+Online-Speicher. Das geht kostenlos mit **Supabase** (keine Kreditkarte nötig):
 
-- Alles funktioniert vollständig auf einem Gerät/Browser (auch mit mehreren Konten).
-- Nutzer auf **anderen Geräten** sehen die Videos jedoch **nicht**, da es keinen
-  gemeinsamen Server gibt.
+1. Auf [supabase.com](https://supabase.com) ein kostenloses Konto erstellen
+2. **New project** anlegen (Name egal, z. B. „shorthub“; Datenbank-Passwort merken)
+3. Links **SQL Editor** öffnen → den kompletten Inhalt der Datei
+   [`supabase-setup.sql`](supabase-setup.sql) hineinkopieren → **Run** klicken
+4. Links **Project Settings → API** öffnen und zwei Werte kopieren:
+   - **Project URL** (z. B. `https://abcdefgh.supabase.co`)
+   - **anon public** API-Key (der lange Schlüssel)
+5. In der Datei **`config.js`** die beiden Platzhalter durch diese Werte ersetzen
+6. Seite neu auf Netlify hochladen – fertig! 🎉
 
-Für echtes geräteübergreifendes Teilen kann später ein Backend-Dienst wie
-**Firebase** oder **Supabase** angebunden werden – die App ist dafür vorbereitet
-(alle Datenzugriffe sind in `app.js` in eigenen Funktionen gekapselt).
+Ab dann gilt:
+- 📤 Hochgeladene Videos liegen **auf dem Server** und sind für alle sichtbar –
+  auf jedem Gerät, bis sie gelöscht werden
+- 👤 **Alle Konten** sind für alle sichtbar und über die Suche zu finden
+- ❤️ Likes, Kommentare, Aufrufe und Follower werden geteilt
+
+**Ohne** eingetragene Zugangsdaten läuft die App im lokalen Modus: alles
+funktioniert, aber nur im eigenen Browser.
+
+> Hinweis: Diese Demo-Konfiguration erlaubt jedem Besucher Lese- und
+> Schreibzugriff auf die Daten – für ein Hobby-Projekt okay, für eine echte
+> öffentliche App sollte später Supabase Auth mit strengeren Regeln ergänzt werden.
 
 ## Dateien
 
@@ -40,6 +55,9 @@ Für echtes geräteübergreifendes Teilen kann später ein Backend-Dienst wie
 | `index.html` | Struktur der App (Login, Feed, Suche, Upload, Profil) |
 | `styles.css` | Dunkles TikTok-ähnliches Design |
 | `app.js` | Gesamte Logik (Konten, Videos, Likes, Kommentare, Follows) |
+| `config.js` | Supabase-Zugangsdaten (für geräteübergreifendes Teilen) |
+| `backend.js` | Server-Anbindung (Supabase REST + Storage) |
+| `supabase-setup.sql` | Einrichtungs-Skript für den Supabase SQL Editor |
 | `netlify.toml` | Netlify-Konfiguration |
 | `logo.png` | Short-Hub-Logo (Login-Screen) |
 | `logo-icon.png` | Logo-Icon (Kopfzeile + Favicon) |

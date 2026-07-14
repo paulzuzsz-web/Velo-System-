@@ -26,7 +26,7 @@ function openDB() {
   });
 }
 
-function dbGetAllVideos() {
+function idbGetAllVideos() {
   return new Promise((resolve, reject) => {
     const tx = db.transaction('videos', 'readonly');
     const req = tx.objectStore('videos').getAll();
@@ -35,7 +35,7 @@ function dbGetAllVideos() {
   });
 }
 
-function dbPutVideo(video) {
+function idbPutVideo(video) {
   return new Promise((resolve, reject) => {
     const tx = db.transaction('videos', 'readwrite');
     tx.objectStore('videos').put(video);
@@ -46,7 +46,7 @@ function dbPutVideo(video) {
 
 // Ein Video atomar lesen, ändern und zurückschreiben – verhindert, dass
 // sich Like-, Kommentar- und Aufruf-Updates gegenseitig überschreiben.
-function dbUpdateVideo(id, mutate) {
+function idbUpdateVideo(id, mutate) {
   return new Promise((resolve, reject) => {
     const tx = db.transaction('videos', 'readwrite');
     const store = tx.objectStore('videos');
@@ -64,7 +64,7 @@ function dbUpdateVideo(id, mutate) {
   });
 }
 
-function dbDeleteVideo(id) {
+function idbDeleteVideo(id) {
   return new Promise((resolve, reject) => {
     const tx = db.transaction('videos', 'readwrite');
     tx.objectStore('videos').delete(id);
@@ -73,13 +73,62 @@ function dbDeleteVideo(id) {
   });
 }
 
-// ---------------- Benutzer (localStorage) ----------------
-function getUsers() {
-  try { return JSON.parse(localStorage.getItem('sh_users')) || {}; }
-  catch { return {}; }
+// ---------- Einheitliche Video-Zugriffe: Server (Supabase) oder lokal ----------
+async function dbGetAllVideos() {
+  if (REMOTE) {
+    try { return await sbFetchVideos(); } catch { return []; }
+  }
+  return idbGetAllVideos();
 }
+
+async function dbUpdateVideo(id, mutate) {
+  if (REMOTE) {
+    const v = await sbFetchVideo(id);
+    if (!v) return null;
+    mutate(v);
+    await sbPatchVideo(v);
+    return v;
+  }
+  return idbUpdateVideo(id, mutate);
+}
+
+async function dbDeleteVideo(id) {
+  if (REMOTE) {
+    await sbDeleteVideoRow(id);
+    await sbDeleteVideoFile(id);
+    return;
+  }
+  return idbDeleteVideo(id);
+}
+
+// Video-Quelle: Server-URL oder lokaler Blob
+function videoURLOf(video) {
+  return video.src || URL.createObjectURL(video.blob);
+}
+
+// ---------------- Benutzer (Server + localStorage-Fallback) ----------------
+let usersCache = null;
+
+function getUsers() {
+  if (usersCache) return usersCache;
+  try { usersCache = JSON.parse(localStorage.getItem('sh_users')) || {}; }
+  catch { usersCache = {}; }
+  return usersCache;
+}
+
 function saveUsers(users) {
+  usersCache = users;
   localStorage.setItem('sh_users', JSON.stringify(users));
+  if (REMOTE) sbUpsertUsers(users).catch(() => {});
+}
+
+// Konten vom Server laden (damit man alle Nutzer sieht und suchen kann)
+async function refreshUsers() {
+  if (!REMOTE) return;
+  try {
+    usersCache = await sbFetchUsers();
+    localStorage.setItem('sh_users', JSON.stringify(usersCache));
+  } catch { /* offline: lokale Kopie weiterverwenden */ }
 }
 function currentUser() {
   return localStorage.getItem('sh_session');
@@ -232,6 +281,7 @@ $('#auth-form').addEventListener('submit', async e => {
     return;
   }
 
+  await refreshUsers(); // aktuelle Konten vom Server holen
   const users = getUsers();
   const hash = await hashPassword(password);
 
@@ -369,7 +419,7 @@ function buildShort(video) {
   el.dataset.id = video.id;
 
   const vid = document.createElement('video');
-  vid.src = URL.createObjectURL(video.blob);
+  vid.src = videoURLOf(video);
   vid.loop = true;
   vid.playsInline = true;
   // Hochformat füllt den ganzen Bildschirm, Querformat wird eingepasst
@@ -634,7 +684,6 @@ $('#upload-form').addEventListener('submit', async e => {
     id: 'v_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
     title,
     uploader: currentUser(),
-    blob: uploadFile,
     likes: [],
     comments: [],
     views: 0,
@@ -643,7 +692,14 @@ $('#upload-form').addEventListener('submit', async e => {
   };
 
   try {
-    await dbPutVideo(video);
+    if (REMOTE) {
+      // Video auf den Server hochladen – für alle sichtbar, auf jedem Gerät
+      video.src = await sbUploadVideoFile(video.id, uploadFile);
+      await sbInsertVideo(video);
+    } else {
+      video.blob = uploadFile;
+      await idbPutVideo(video);
+    }
   } catch (err) {
     submitBtn.disabled = false;
     errEl.textContent = t('saveFailed');
@@ -683,6 +739,21 @@ async function renderSearch(query) {
   const q = (query || '').trim().toLowerCase();
   const results = $('#search-results');
   results.innerHTML = '';
+
+  // Konten suchen (wie bei TikTok)
+  if (q) await refreshUsers();
+  const users = getUsers();
+  const userMatches = q
+    ? Object.keys(users).filter(n =>
+        n.toLowerCase().includes(q) || displayNameOf(n).toLowerCase().includes(q))
+    : [];
+  const accTitle = $('#account-results-title');
+  const accResults = $('#account-results');
+  accResults.innerHTML = '';
+  accTitle.classList.toggle('hidden', userMatches.length === 0);
+  userMatches.forEach(name => accResults.appendChild(buildUserRow(name)));
+
+  // Videos suchen
   const videos = await dbGetAllVideos();
   const matches = q
     ? videos.filter(v =>
@@ -690,7 +761,7 @@ async function renderSearch(query) {
         v.uploader.toLowerCase().includes(q) ||
         displayNameOf(v.uploader).toLowerCase().includes(q))
     : videos.slice().sort((a, b) => b.ts - a.ts);
-  $('#search-empty').classList.toggle('hidden', matches.length > 0);
+  $('#search-empty').classList.toggle('hidden', matches.length > 0 || userMatches.length > 0);
   matches.forEach(v => results.appendChild(buildGridItem(v)));
 }
 
@@ -698,7 +769,7 @@ function buildGridItem(video, { deletable = false } = {}) {
   const item = document.createElement('div');
   item.className = 'grid-item';
   const vid = document.createElement('video');
-  vid.src = URL.createObjectURL(video.blob);
+  vid.src = videoURLOf(video);
   vid.muted = true;
   vid.preload = 'metadata';
   const title = document.createElement('div');
@@ -740,6 +811,7 @@ async function openSingleVideo(videoId) {
 
 // ---------------- Profil ----------------
 async function renderProfile(username) {
+  await refreshUsers(); // Follower-Zahlen etc. vom Server aktualisieren
   const isOwn = username === currentUser();
   const users = getUsers();
   const user = users[username];
@@ -853,32 +925,35 @@ async function renderProfile(username) {
   }
 }
 
+// ---------------- Nutzer-Zeile (Follower-Liste + Account-Suche) ----------------
+function buildUserRow(name) {
+  const row = document.createElement('button');
+  row.className = 'userlist-row';
+  row.appendChild(avatarWithCrown(name, 'userlist-avatar'));
+  const info = document.createElement('div');
+  info.className = 'userlist-info';
+  const dn = document.createElement('div');
+  dn.className = 'userlist-name';
+  dn.appendChild(nameWithBadge(name, true));
+  const handle = document.createElement('div');
+  handle.className = 'userlist-handle';
+  handle.textContent = '@' + name;
+  info.append(dn, handle);
+  row.appendChild(info);
+  row.addEventListener('click', () => {
+    closeUserList();
+    profileViewUser = name;
+    showPage('profile');
+  });
+  return row;
+}
+
 // ---------------- Follower-/Gefolgt-Liste ----------------
 function openUserList(title, usernames) {
   $('#userlist-title').textContent = `${title} (${usernames.length})`;
   const list = $('#userlist-list');
   list.innerHTML = '';
-  usernames.forEach(name => {
-    const row = document.createElement('button');
-    row.className = 'userlist-row';
-    row.appendChild(avatarWithCrown(name, 'userlist-avatar'));
-    const info = document.createElement('div');
-    info.className = 'userlist-info';
-    const dn = document.createElement('div');
-    dn.className = 'userlist-name';
-    dn.appendChild(nameWithBadge(name, true));
-    const handle = document.createElement('div');
-    handle.className = 'userlist-handle';
-    handle.textContent = '@' + name;
-    info.append(dn, handle);
-    row.appendChild(info);
-    row.addEventListener('click', () => {
-      closeUserList();
-      profileViewUser = name;
-      showPage('profile');
-    });
-    list.appendChild(row);
-  });
+  usernames.forEach(name => list.appendChild(buildUserRow(name)));
   $('#userlist-overlay').classList.remove('hidden');
 }
 
@@ -981,14 +1056,18 @@ $('#save-username').addEventListener('click', async () => {
     u.following = (u.following || []).map(n => n === oldName ? newName : n);
   });
   saveUsers(users);
+  if (REMOTE) sbDeleteUser(oldName).catch(() => {});
 
   const videos = await dbGetAllVideos();
   for (const v of videos) {
-    let changed = false;
-    if (v.uploader === oldName) { v.uploader = newName; changed = true; }
-    if (v.likes.includes(oldName)) { v.likes = v.likes.map(n => n === oldName ? newName : n); changed = true; }
-    v.comments.forEach(c => { if (c.user === oldName) { c.user = newName; changed = true; } });
-    if (changed) await dbPutVideo(v);
+    const affected = v.uploader === oldName || v.likes.includes(oldName) ||
+      v.comments.some(c => c.user === oldName);
+    if (!affected) continue;
+    await dbUpdateVideo(v.id, vv => {
+      if (vv.uploader === oldName) vv.uploader = newName;
+      vv.likes = vv.likes.map(n => n === oldName ? newName : n);
+      vv.comments.forEach(c => { if (c.user === oldName) c.user = newName; });
+    });
   }
 
   setSession(newName);
@@ -1041,6 +1120,7 @@ $('#redeem-code').addEventListener('click', () => {
   applyI18n();
   setAuthMode('login');
   await openDB();
+  await refreshUsers();
   if (currentUser() && getUsers()[currentUser()]) {
     enterApp();
   }

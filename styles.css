@@ -385,6 +385,9 @@ html, body {
 .userlist-name { font-weight: 700; font-size: .95rem; }
 .userlist-handle { font-size: .8rem; color: var(--text-dim); }
 .stat-clickable { cursor: pointer; }
+.search-section-title { font-size: .95rem; color: var(--text-dim); margin-bottom: 8px; }
+#account-results { margin-bottom: 14px; }
+#account-results .userlist-row { padding: 8px 4px; }
 .stat-clickable:hover b { color: var(--accent-2); }
 
 /* ===== Blauer Haken ===== */
