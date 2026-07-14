@@ -11,8 +11,8 @@
 
 'use strict';
 
-let SUPABASE_URL = 'HIER_DEINE_SUPABASE_URL';      // z. B. 'https://abcdefgh.supabase.co'
-let SUPABASE_ANON_KEY = 'HIER_DEIN_ANON_KEY';      // der lange "anon public" Schlüssel
+let SUPABASE_URL = 'https://cqsjndrchltkumwmflwh.supabase.co';
+let SUPABASE_ANON_KEY = 'sb_publishable_GVTj796tNjGJV3bwTWx7gA_lhC2UNIw';
 
 // Platzhalter noch nicht ersetzt? Dann lokaler Modus.
 if (!/^https?:\/\//.test(SUPABASE_URL)) { SUPABASE_URL = ''; SUPABASE_ANON_KEY = ''; }
