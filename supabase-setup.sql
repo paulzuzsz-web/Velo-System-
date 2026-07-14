@@ -1,6 +1,7 @@
 -- ====================================================================
 -- Short Hub – Supabase-Einrichtung
 -- Dieses Skript im Supabase "SQL Editor" einfügen und auf RUN klicken.
+-- Es kann gefahrlos mehrfach ausgeführt werden.
 -- ====================================================================
 
 -- Konten
@@ -14,7 +15,7 @@ create table if not exists users (
   ceo boolean default false
 );
 
--- Videos (die Videodatei selbst liegt im Storage-Bucket "videos")
+-- Videos (die Videodatei liegt im Storage-Bucket "videos" oder direkt in src)
 create table if not exists videos (
   id text primary key,
   title text,
@@ -34,11 +35,13 @@ drop policy if exists "shorthub videos" on videos;
 create policy "shorthub users" on users for all using (true) with check (true);
 create policy "shorthub videos" on videos for all using (true) with check (true);
 
--- Speicher-Bucket für die Videodateien (öffentlich lesbar)
-insert into storage.buckets (id, name, public)
-values ('videos', 'videos', true)
-on conflict (id) do update set public = true;
-
-drop policy if exists "shorthub storage" on storage.objects;
-create policy "shorthub storage" on storage.objects
-  for all using (bucket_id = 'videos') with check (bucket_id = 'videos');
+-- ====================================================================
+-- OPTIONAL (bessere Video-Performance): Storage-Bucket einrichten.
+-- Das geht NICHT per SQL, sondern im Dashboard:
+--   1. Links "Storage" öffnen -> "New bucket" -> Name: videos
+--      -> "Public bucket" AKTIVIEREN -> Save
+--   2. Beim Bucket auf "Policies" -> "New policy" -> Vorlage
+--      "Allow access to everyone" (bzw. alle Operationen erlauben)
+-- Ohne Bucket funktioniert alles trotzdem – Videos werden dann
+-- direkt in der Datenbank gespeichert.
+-- ====================================================================

@@ -694,7 +694,7 @@ $('#upload-form').addEventListener('submit', async e => {
   try {
     if (REMOTE) {
       // Video auf den Server hochladen – für alle sichtbar, auf jedem Gerät
-      video.src = await sbUploadVideoFile(video.id, uploadFile);
+      video.src = await sbStoreVideoFile(video.id, uploadFile);
       await sbInsertVideo(video);
     } else {
       video.blob = uploadFile;
@@ -702,7 +702,7 @@ $('#upload-form').addEventListener('submit', async e => {
     }
   } catch (err) {
     submitBtn.disabled = false;
-    errEl.textContent = t('saveFailed');
+    errEl.textContent = t('saveFailed') + ' [' + (err && err.message || err) + ']';
     return;
   }
 
@@ -1116,10 +1116,25 @@ $('#redeem-code').addEventListener('click', () => {
 
 // ---------------- Start ----------------
 (async function init() {
+  // ?reset=1 löscht alle lokalen Daten (Konten, Videos, Anmeldung)
+  if (new URLSearchParams(location.search).has('reset')) {
+    localStorage.removeItem('sh_users');
+    localStorage.removeItem('sh_session');
+    usersCache = null;
+    await new Promise(r => { const req = indexedDB.deleteDatabase(DB_NAME); req.onsuccess = req.onerror = req.onblocked = r; });
+    history.replaceState(null, '', location.pathname);
+  }
+
   setLang(getLang());
   applyI18n();
   setAuthMode('login');
   await openDB();
+
+  // Server prüfen: nicht erreichbar/eingerichtet -> lokaler Modus
+  const wasRemote = REMOTE;
+  await sbCheckSetup();
+  if (wasRemote && !REMOTE) showToast(t('localMode'));
+
   await refreshUsers();
   if (currentUser() && getUsers()[currentUser()]) {
     enterApp();

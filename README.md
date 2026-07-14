@@ -41,8 +41,17 @@ Ab dann gilt:
 - 👤 **Alle Konten** sind für alle sichtbar und über die Suche zu finden
 - ❤️ Likes, Kommentare, Aufrufe und Follower werden geteilt
 
-**Ohne** eingetragene Zugangsdaten läuft die App im lokalen Modus: alles
+**Ohne** eingetragene Zugangsdaten – oder wenn der Server nicht erreichbar/
+eingerichtet ist – läuft die App automatisch im lokalen Modus: alles
 funktioniert, aber nur im eigenen Browser.
+
+### Alle Daten löschen (frisch anfangen)
+
+- **Server-Daten** (alle Videos + Profile für alle): Datei
+  [`supabase-reset.sql`](supabase-reset.sql) im Supabase **SQL Editor**
+  ausführen.
+- **Lokale Daten** (nur dieses Gerät): die Seite einmal mit `?reset=1`
+  öffnen, z. B. `https://deine-seite.netlify.app/?reset=1`.
 
 > Hinweis: Diese Demo-Konfiguration erlaubt jedem Besucher Lese- und
 > Schreibzugriff auf die Daten – für ein Hobby-Projekt okay, für eine echte
