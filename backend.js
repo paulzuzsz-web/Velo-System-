@@ -5,7 +5,21 @@
 
 'use strict';
 
-const REMOTE = typeof SUPABASE_URL === 'string' && /^https?:\/\//.test(SUPABASE_URL);
+let REMOTE = typeof SUPABASE_URL === 'string' && /^https?:\/\//.test(SUPABASE_URL);
+
+// Prüft beim Start, ob der Server erreichbar und eingerichtet ist.
+// Falls nicht, läuft die App im lokalen Modus weiter statt kaputt zu sein.
+async function sbCheckSetup() {
+  if (!REMOTE) return true;
+  try {
+    await sbFetchUsers();
+    await sbFetchVideos();
+    return true;
+  } catch {
+    REMOTE = false;
+    return false;
+  }
+}
 
 function sbHeaders(extra = {}) {
   return Object.assign({
@@ -121,4 +135,23 @@ async function sbDeleteVideoFile(id) {
   await fetch(`${SUPABASE_URL}/storage/v1/object/videos/${encodeURIComponent(id)}`, {
     method: 'DELETE', headers: sbHeaders()
   });
+}
+
+// Video speichern: erst in den Storage-Bucket; wenn der nicht eingerichtet
+// ist, wird das Video direkt in der Datenbank abgelegt (Daten-URL).
+function fileToDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function sbStoreVideoFile(id, file) {
+  try {
+    return await sbUploadVideoFile(id, file);
+  } catch {
+    return await fileToDataURL(file);
+  }
 }
